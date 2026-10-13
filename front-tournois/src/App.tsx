@@ -1,122 +1,115 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import type { Screen } from "./types.ts";
+import type { Utilisateur } from "./api/types.ts";
+import { utilisateursApi } from "./api/utilisateurs.ts";
+import Sidebar from "./components/Sidebar.tsx";
+import ApiState from "./components/ApiState.tsx";
+import TournamentsPage from "./pages/TournamentsPage.tsx";
+import TournamentDetailPage from "./pages/TournamentDetailPage.tsx";
+import TeamPage from "./pages/TeamPage.tsx";
+import AdminPage from "./pages/AdminPage.tsx";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+const CURRENT_USER_KEY = "liut.currentUserId";
+
+export default function App() {
+  const [screen, setScreen] = useState<Screen>("tournaments");
+  const [selectedTournoiId, setSelectedTournoiId] = useState<number | null>(null);
+  const [selectedEquipeId, setSelectedEquipeId] = useState<number | null>(null);
+
+  const [users, setUsers] = useState<Utilisateur[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [usersError, setUsersError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(() => {
+    const stored = localStorage.getItem(CURRENT_USER_KEY);
+    return stored ? Number(stored) : null;
+  });
+
+  function loadUsers() {
+    setUsersLoading(true);
+    setUsersError(null);
+    utilisateursApi
+      .lister()
+      .then(setUsers)
+      .catch((e) => setUsersError(e.message ?? "Erreur de chargement des utilisateurs"))
+      .finally(() => setUsersLoading(false));
+  }
+
+  useEffect(loadUsers, []);
+
+  function handleChangeUser(id: number | null) {
+    setCurrentUserId(id);
+    if (id) localStorage.setItem(CURRENT_USER_KEY, String(id));
+    else localStorage.removeItem(CURRENT_USER_KEY);
+    // Si l'utilisateur quitte le rôle admin, on sort de l'écran Administration.
+    if (!users.find((u) => u.id === id)?.is_admin && screen === "admin") {
+      setScreen("tournaments");
+    }
+  }
+
+  function goTo(next: Screen) {
+    setScreen(next);
+    window.scrollTo?.(0, 0);
+  }
+
+  function openTournoi(id: number) {
+    setSelectedTournoiId(id);
+    goTo("detail");
+  }
+
+  function openEquipe(id: number) {
+    setSelectedEquipeId(id);
+    goTo("team");
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="liut-app">
+      <div className="app">
+        <Sidebar
+          screen={screen}
+          goTo={goTo}
+          users={users}
+          currentUserId={currentUserId}
+          onChangeUser={handleChangeUser}
+        />
+        <main className="main">
+          {(usersLoading || usersError) && (
+            <ApiState loading={usersLoading} error={usersError} onRetry={loadUsers} />
+          )}
 
-      <div className="ticks"></div>
+          {!usersLoading && !usersError && currentUserId === null && (
+            <p className="search-hint" style={{ marginBottom: 18 }}>
+              Choisissez un utilisateur dans la barre latérale pour simuler une connexion (le backend fourni
+              n'expose pas encore de route d'authentification).
+            </p>
+          )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          {screen === "tournaments" && <TournamentsPage openTournoi={openTournoi} />}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          {screen === "detail" && selectedTournoiId !== null && (
+            <TournamentDetailPage
+              tournoiId={selectedTournoiId}
+              currentUserId={currentUserId}
+              openEquipe={openEquipe}
+              goBack={() => goTo("tournaments")}
+            />
+          )}
+          {screen === "detail" && selectedTournoiId === null && (
+            <p className="search-hint">Sélectionnez d'abord un tournoi depuis l'écran « Tournois ».</p>
+          )}
+
+          {screen === "team" && (
+            <TeamPage
+              equipeId={selectedEquipeId}
+              currentUserId={currentUserId}
+              onPickEquipe={setSelectedEquipeId}
+              onClearEquipe={() => setSelectedEquipeId(null)}
+            />
+          )}
+
+          {screen === "admin" && <AdminPage currentUserId={currentUserId} openTournoi={openTournoi} />}
+        </main>
+      </div>
+    </div>
+  );
 }
-
-export default App

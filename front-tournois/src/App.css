@@ -1,184 +1,1134 @@
-.counter {
+.liut-app {
+  --bg: #f6f4ef;
+  --surface: #ffffff;
+  --ink: #1c1a20;
+  --ink-soft: #6e6a76;
+  --ink-faint: #a9a5ae;
+  --line: #e1ddd3;
+  --line-strong: #c9c4b6;
+  --accent: #453368;
+  --accent-soft: #ede9f5;
+  --live: #b8432c;
+  --live-soft: #fbeae5;
+  --closed: #a0721b;
+  --closed-soft: #f8eeda;
+  --done: #2e6b4f;
+  --done-soft: #e6f0ea;
+  --radius-s: 3px;
+  --radius-m: 6px;
+
   font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.liut-app * {
+  box-sizing: border-box;
+}
+.liut-app h1,
+.liut-app h2,
+.liut-app h3,
+.liut-app h4 {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+.liut-app p {
+  margin: 0;
+}
+.liut-app button {
+  font-family: inherit;
+  cursor: pointer;
+}
+.liut-app .app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
 }
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
-}
-
-#center {
+/* ---------- Sidebar ---------- */
+.liut-app .rail {
+  background: var(--ink);
+  color: #edeaf3;
+  padding: 22px 16px;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  gap: 28px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
-
-#next-steps {
+.liut-app .rail-brand {
   display: flex;
-  border-top: 1px solid var(--border);
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 6px;
+}
+.liut-app .rail-brand .mark {
+  font-family: "Barlow Condensed";
+  font-weight: 700;
+  font-size: 22px;
+  color: #fff;
+  line-height: 1;
+}
+.liut-app .rail-brand .sub {
+  font-size: 11px;
+  color: #9a93ac;
+  letter-spacing: 0.3px;
+}
+.liut-app .rail nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.liut-app .rail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-s);
+  color: #c8c2d6;
+  font-size: 14.5px;
+  font-weight: 500;
+  border: none;
+  background: none;
   text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  width: 100%;
+}
+.liut-app .rail-item svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+.liut-app .rail-item:hover {
+  background: #2a2534;
+  color: #fff;
+}
+.liut-app .rail-item.active {
+  background: #edeaf3;
+  color: var(--accent);
+}
+.liut-app .rail-item.active svg {
+  opacity: 1;
+}
+.liut-app .rail-foot {
+  margin-top: auto;
+  padding: 10px 10px;
+  border-top: 1px solid #322c40;
+}
+.liut-app .rail-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.liut-app .rail-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.liut-app .rail-user-meta {
+  line-height: 1.25;
+}
+.liut-app .rail-user-meta .name {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+}
+.liut-app .rail-user-meta .role {
+  font-size: 11px;
+  color: #9a93ac;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+/* ---------- Main ---------- */
+.liut-app .main {
+  padding: 30px 40px 60px;
+  max-width: 1180px;
+}
+.liut-app .screen {
+  display: block;
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+.liut-app .page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 22px;
+  gap: 20px;
+}
+.liut-app .page-head h1 {
+  font-size: 34px;
+}
+.liut-app .page-head .lede {
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  margin-top: 4px;
+  max-width: 46ch;
+}
+.liut-app .btn {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  padding: 9px 16px;
+  border-radius: var(--radius-s);
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.liut-app .btn:hover {
+  background: #000;
+}
+.liut-app .btn.ghost {
+  background: none;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.liut-app .btn.ghost:hover {
+  border-color: var(--ink);
+}
+.liut-app .btn.small {
+  padding: 6px 12px;
+  font-size: 12.5px;
+}
+.liut-app .btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* filter chips */
+.liut-app .chips {
   display: flex;
   gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.liut-app .chip {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.liut-app .chip.on {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.liut-app .chip .count {
+  opacity: 0.55;
+  font-weight: 500;
+  margin-left: 4px;
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+/* tournament cards */
+.liut-app .grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+}
+.liut-app .t-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.12s;
+}
+.liut-app .t-card:hover {
+  border-color: var(--line-strong);
+}
+.liut-app .t-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+.liut-app .t-card h3 {
+  font-size: 20px;
+  line-height: 1.1;
+}
+.liut-app .t-game {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 3px;
+  font-weight: 500;
+}
+.liut-app .badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+.liut-app .badge.open {
+  background: var(--done-soft);
+  color: var(--done);
+}
+.liut-app .badge.closed {
+  background: var(--closed-soft);
+  color: var(--closed);
+}
+.liut-app .badge.live {
+  background: var(--live-soft);
+  color: var(--live);
+}
+.liut-app .badge.ended {
+  background: #eeedf2;
+  color: #5e5a68;
+}
+.liut-app .t-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--line);
+  padding-top: 11px;
+}
+.liut-app .t-meta .fill {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink);
+}
+.liut-app .bar {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.liut-app .bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
 }
 
-.ticks {
+/* ---------- Detail screen ---------- */
+.liut-app .detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.liut-app .crumb {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+.liut-app .crumb button {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  padding: 0;
+  text-decoration: underline;
+}
+.liut-app .detail-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.liut-app .detail-title h1 {
+  font-size: 32px;
+}
+.liut-app .detail-sub {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  margin-top: 6px;
+}
+
+.liut-app .tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+  margin: 22px 0 22px;
+}
+.liut-app .tab {
+  padding: 10px 4px;
+  margin-right: 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
   position: relative;
+  top: 1px;
+}
+.liut-app .tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.liut-app .subscreen.active {
+  display: block;
+}
+
+/* teams list */
+.liut-app .team-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.liut-app .team-row:last-child {
+  border-bottom: none;
+}
+.liut-app .team-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.liut-app .team-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+.liut-app .team-name {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+.liut-app .team-cap {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.liut-app .team-count {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* bracket */
+.liut-app .bracket-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 9px 12px;
+  border-radius: var(--radius-s);
+}
+.liut-app .bracket-wrap {
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+.liut-app .bracket {
+  display: flex;
+  gap: 52px;
+  min-width: 760px;
+  padding: 6px 2px 20px;
+}
+.liut-app .round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 18px;
+  position: relative;
+  min-width: 190px;
+}
+.liut-app .round-label {
+  position: absolute;
+  top: -26px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-faint);
+}
+.liut-app .match {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  position: relative;
+}
+.liut-app .match.live {
+  border-color: var(--live);
+  box-shadow: 0 0 0 1px var(--live) inset;
+}
+.liut-app .m-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+.liut-app .m-row:first-child {
+  border-bottom: 1px solid var(--line);
+}
+.liut-app .m-row .name {
+  font-weight: 600;
+}
+.liut-app .m-row.win .name {
+  color: var(--ink);
+}
+.liut-app .m-row.lose .name {
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+.liut-app .m-row .score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 13px;
+}
+.liut-app .m-row.win .score {
+  color: var(--done);
+}
+.liut-app .m-live-tag {
+  position: absolute;
+  top: -9px;
+  left: 10px;
+  background: var(--live);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.liut-app .connector {
+  position: absolute;
+  right: -27px;
+  top: 50%;
+  width: 26px;
+  border-top: 1px solid var(--line-strong);
+}
+
+/* results table */
+.liut-app table.results {
   width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.liut-app table.results th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ink-faint);
+  font-weight: 700;
+  padding: 0 10px 10px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.liut-app table.results td {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.liut-app table.results tr:last-child td {
+  border-bottom: none;
+}
+.liut-app .score-final {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+/* ---------- Team screen ---------- */
+.liut-app .team-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.liut-app .panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 20px;
+}
+.liut-app .panel h3 {
+  font-size: 15px;
+  margin-bottom: 14px;
+}
+.liut-app .roster-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.liut-app .roster-row:last-child {
+  border-bottom: none;
+}
+.liut-app .roster-id {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.liut-app .p-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eeedf2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.liut-app .p-name {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.liut-app .p-role {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+.liut-app .role-tag {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+.liut-app .role-tag.cap {
+  background: var(--closed-soft);
+  color: var(--closed);
+}
+.liut-app .invite-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-s);
+  padding: 10px 12px;
+  font-size: 13px;
+  margin-top: 14px;
+}
+.liut-app .invite-box code {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: "Inter";
+  color: var(--ink);
+}
+.liut-app .slots-line {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+.liut-app .chat {
+  display: flex;
+  flex-direction: column;
+  height: 340px;
+}
+.liut-app .chat-msgs {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 2px;
+}
+.liut-app .msg {
+  max-width: 80%;
+}
+.liut-app .msg .who {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+.liut-app .msg .bubble {
+  background: var(--bg);
+  border-radius: 10px 10px 10px 2px;
+  padding: 8px 11px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.liut-app .msg.me {
+  align-self: flex-end;
+}
+.liut-app .msg.me .who {
+  text-align: right;
+}
+.liut-app .msg.me .bubble {
+  background: var(--accent-soft);
+  border-radius: 10px 10px 2px 10px;
+  color: #332755;
+}
+.liut-app .chat-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.liut-app .chat-input input {
+  flex: 1;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  padding: 9px 11px;
+  font-size: 13px;
+  font-family: inherit;
+}
+.liut-app .chat-hint {
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-top: 8px;
+}
+
+/* ---------- Admin screen ---------- */
+.liut-app .admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 22px;
+  align-items: start;
+}
+.liut-app .form-row {
+  margin-bottom: 14px;
+}
+.liut-app .form-row label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+}
+.liut-app .form-row input,
+.liut-app .form-row select {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  padding: 9px 11px;
+  font-size: 13.5px;
+  font-family: inherit;
+  background: var(--surface);
+}
+.liut-app .form-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.liut-app .admin-list-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.liut-app .admin-list-row:last-child {
+  border-bottom: none;
+}
+.liut-app .admin-t-name {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.liut-app .admin-t-meta {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.liut-app .admin-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.liut-app .dispute {
+  border: 1px solid var(--live);
+  background: var(--live-soft);
+  border-radius: var(--radius-s);
+  padding: 14px;
+  margin-top: 16px;
+}
+.liut-app .dispute h4 {
+  font-size: 13px;
+  color: var(--live);
+  margin-bottom: 6px;
+}
+.liut-app .dispute p {
+  font-size: 12.5px;
+  color: #6b3025;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.liut-app .dispute-actions {
+  display: flex;
+  gap: 8px;
+}
+.liut-app .dispute-actions .btn.small.alt {
+  background: var(--live);
+  border-color: var(--live);
+}
+
+/* ---------- Search ---------- */
+.liut-app .search-bar {
+  position: relative;
+  max-width: 340px;
+  margin-bottom: 18px;
+}
+.liut-app .search-bar svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--ink-faint);
+}
+.liut-app .search-bar input {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 9px 14px 9px 32px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--ink);
+}
+.liut-app .search-bar input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.liut-app .search-hint {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin-top: 6px;
+}
+
+/* ---------- Live indicator ---------- */
+.liut-app .live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--live);
+  display: inline-block;
+  position: relative;
+}
+.liut-app .live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--live);
+  animation: liut-pulse 1.8s ease-out infinite;
+}
+@keyframes liut-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+.liut-app .live-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--live);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .liut-app .live-dot::after {
+    animation: none;
+  }
+}
+
+/* ---------- Engagement banner (join/create/status on detail) ---------- */
+.liut-app .engage-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.liut-app .engage-bar.locked {
+  background: #f4f1e8;
+  border-color: var(--line-strong);
+}
+.liut-app .engage-copy {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.liut-app .engage-copy strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+.liut-app .engage-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.liut-app .lock-icon {
+  width: 13px;
+  height: 13px;
+  vertical-align: -2px;
+  margin-right: 5px;
+  color: var(--ink-soft);
+}
+.liut-app .pill-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--done);
+  background: var(--done-soft);
+  padding: 5px 11px;
+  border-radius: 20px;
+}
+
+/* ---------- Join-team panel ---------- */
+.liut-app .join-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+.liut-app .join-panel h4 {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.liut-app .join-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.liut-app .join-row:last-child {
+  border-bottom: none;
+}
+.liut-app .join-row .team-avatar {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+.liut-app .join-row .slots {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  margin-left: 6px;
+}
+
+/* ---------- Captain actions (kebab menu) ---------- */
+.liut-app .roster-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.liut-app .kebab-wrap {
+  position: relative;
+}
+.liut-app .kebab-btn {
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  padding: 4px 6px;
+  border-radius: var(--radius-s);
+  line-height: 0;
+}
+.liut-app .kebab-btn:hover {
+  background: var(--bg);
+  color: var(--ink);
+}
+.liut-app .kebab-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  box-shadow: 0 6px 18px rgba(20, 16, 30, 0.12);
+  min-width: 190px;
+  z-index: 5;
+  padding: 5px;
+}
+.liut-app .kebab-menu.open {
+  display: block;
+}
+.liut-app .kebab-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+.liut-app .kebab-menu button:hover {
+  background: var(--bg);
+}
+.liut-app .kebab-menu button.danger {
+  color: var(--live);
+}
+.liut-app .kebab-menu .sep {
+  height: 1px;
+  background: var(--line);
+  margin: 4px 2px;
+}
+.liut-app .name-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.liut-app .name-edit input {
+  font-family: "Barlow Condensed";
+  font-weight: 700;
+  font-size: 32px;
+  border: none;
+  border-bottom: 2px solid var(--accent);
+  background: none;
+  color: var(--ink);
+  padding: 0 2px;
+  width: 280px;
+}
+.liut-app .icon-btn {
+  background: none;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+.liut-app .icon-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+/* ---------- Match result / forfeit form (admin) ---------- */
+.liut-app .match-manage {
+  border-top: 1px dashed var(--line-strong);
+  margin-top: 10px;
+  padding-top: 12px;
+  display: none;
+}
+.liut-app .match-manage.open {
+  display: block;
+}
+.liut-app .match-manage-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+.liut-app .match-manage-row .m-team {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+.liut-app .match-manage-row input[type="number"] {
+  width: 56px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  text-align: center;
+}
+.liut-app .match-manage-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.liut-app .warn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--closed);
+  background: var(--closed-soft);
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-left: 8px;
+}
+
+/* ---------- Admin: team spaces read-only viewer ---------- */
+.liut-app .space-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.liut-app .space-row:last-child {
+  border-bottom: none;
+}
+.liut-app .space-row .st {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.liut-app .space-row .st.closed {
+  color: var(--live);
+}
+
+@media (max-width: 900px) {
+  .liut-app .engage-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .liut-app .name-edit input {
+    width: 100%;
+  }
+  .liut-app .app {
+    grid-template-columns: 1fr;
+  }
+  .liut-app .rail {
+    position: relative;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 16px;
+  }
+  .liut-app .rail nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .liut-app .rail-foot {
+    display: none;
+  }
+  .liut-app .team-layout,
+  .liut-app .admin-grid {
+    grid-template-columns: 1fr;
+  }
+  .liut-app .main {
+    padding: 20px;
   }
 }
