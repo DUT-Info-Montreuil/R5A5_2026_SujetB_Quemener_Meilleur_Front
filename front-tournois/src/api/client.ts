@@ -1,6 +1,8 @@
+import { tokenStore, UNAUTHORIZED_EVENT } from "./token.ts";
+
 // Base de l'API FastAPI. Configurable via un fichier .env (voir .env.example) :
 //   VITE_API_BASE_URL=http://localhost:8000
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export class ApiError extends Error {
   status: number;
@@ -12,18 +14,31 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = tokenStore.get();
+
   let res: Response;
   try {
     res = await fetch(`${BASE_URL}${path}`, {
-      headers: { "Content-Type": "application/json", ...(options.headers ?? {}) },
       ...options,
+      headers: {
+        "Content-Type": "application/json",
+        // Jeton de connexion envoyé à chaque requête
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers ?? {}),
+      },
     });
   } catch {
     // Erreur réseau : backend injoignable ou CORS bloqué.
     throw new ApiError(
-      0,
-      `Impossible de joindre l'API (${BASE_URL}${path}). Le backend est-il démarré et le CORS configuré ?`
+        0,
+        `Impossible de joindre l'API (${BASE_URL}${path}). Le backend est-il démarré et le CORS configuré ?`
     );
+  }
+
+  // Jeton expiré ou invalide : on prévient App.tsx, qui renvoie à la page de connexion.
+  if (res.status === 401) {
+    tokenStore.clear();
+    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
   }
 
   if (!res.ok) {
