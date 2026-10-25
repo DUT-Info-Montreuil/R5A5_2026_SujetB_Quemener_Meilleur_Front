@@ -5,15 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="59efb4f9-9980-44cf-b2d1-aaec1071f1d2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/R5A5_2026_SujetB_Quemener_Meilleur_Front.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/discord.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front-tournois/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/front-tournois/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-tournois/src/api/client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/front-tournois/src/api/client.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front-tournois/src/components/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/front-tournois/src/components/Sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-tournois/src/pages/TournamentDetailPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/front-tournois/src/pages/TournamentDetailPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +62,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "authentification",
+    "git-widget-placeholder": "admin",
     "javascript.preferred.runtime.type.id": "node",
     "last_opened_file_path": "C:/xampp/htdocs/sae",
     "node.js.detected.package.eslint": "true",

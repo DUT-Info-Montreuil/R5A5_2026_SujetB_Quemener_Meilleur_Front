@@ -23,9 +23,11 @@ export default function Sidebar({ screen, goTo, currentUser, onLogout }: Sidebar
                 >
                     <IconTrophy /> Tournois
                 </button>
-                <button className={`rail-item ${screen === "team" ? "active" : ""}`} onClick={() => goTo("team")}>
-                    <IconTeam /> Mon équipe
-                </button>
+                {!currentUser.is_admin && (
+                    <button className={`rail-item ${screen === "team" ? "active" : ""}`} onClick={() => goTo("team")}>
+                        <IconTeam /> Mon équipe
+                    </button>
+                )}
                 {currentUser.is_admin && (
                     <button className={`rail-item ${screen === "admin" ? "active" : ""}`} onClick={() => goTo("admin")}>
                         <IconShield /> Administration

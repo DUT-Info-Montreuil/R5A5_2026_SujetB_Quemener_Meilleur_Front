@@ -97,6 +97,7 @@ export default function App() {
                 <TournamentDetailPage
                     tournoiId={selectedTournoiId}
                     currentUserId={currentUserId}
+                    isAdmin={currentUser.is_admin}
                     openEquipe={openEquipe}
                     goBack={() => goTo("tournaments")}
                 />
@@ -110,7 +111,11 @@ export default function App() {
                     equipeId={selectedEquipeId}
                     currentUserId={currentUserId}
                     onPickEquipe={setSelectedEquipeId}
-                    onClearEquipe={() => setSelectedEquipeId(null)}
+                    onClearEquipe={() => {
+                      setSelectedEquipeId(null);
+                      // Un admin n'a pas de « Mes équipes » : retour au tournoi consulté
+                      if (currentUser.is_admin) goTo(selectedTournoiId !== null ? "detail" : "tournaments");
+                    }}
                 />
             )}
 
