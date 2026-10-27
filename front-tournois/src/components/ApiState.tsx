@@ -18,11 +18,13 @@ export default function ApiState({ loading, error, onRetry }: ApiStateProps) {
         <div className="engage-copy" style={{ color: "var(--live)" }}>
           {error}
         </div>
+
         {onRetry && (
           <button className="btn ghost small" onClick={onRetry}>
             Réessayer
           </button>
         )}
+
       </div>
     );
   }
