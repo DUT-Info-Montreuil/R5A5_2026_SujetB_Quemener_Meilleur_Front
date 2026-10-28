@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import type { Tournoi, TournoiDetail, TournoiStatut, Message } from "../api/types.ts";
+import type { Tournoi, TournoiDetail, TournoiStatut, Message, ArbreMatch } from "../api/types.ts";
 import { tournoisApi } from "../api/tournois.ts";
 import { matchsApi } from "../api/matchs.ts";
 import { messagesApi } from "../api/messages.ts";
 import ApiState from "../components/ApiState.tsx";
+import BracketSection from "../components/BracketSection.tsx";
 
 interface AdminPageProps {
   currentUserId: number | null;
@@ -27,7 +28,7 @@ const STATUT_LABEL: Record<TournoiStatut, string> = {
 
 const TRANSITION_ACTION_LABEL: Record<TournoiStatut, string> = {
   FERME: "Clore les inscriptions",
-  EN_COURS: "Démarrer le tournoi",
+  EN_COURS: "Démarrer (génère l'arbre)",
   TERMINE: "Clôturer le tournoi",
   OUVERT: "Rouvrir",
 };
@@ -35,33 +36,33 @@ const TRANSITION_ACTION_LABEL: Record<TournoiStatut, string> = {
 export default function AdminPage({ currentUserId }: AdminPageProps) {
   if (currentUserId === null) {
     return (
-      <section className="screen active">
-        <div className="page-head">
-          <div>
-            <h1>Administration</h1>
-            <p className="lede">Sélectionnez un utilisateur administrateur dans la barre latérale.</p>
+        <section className="screen active">
+          <div className="page-head">
+            <div>
+              <h1>Administration</h1>
+              <p className="lede">Sélectionnez un utilisateur administrateur dans la barre latérale.</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
     );
   }
 
   return (
-    <section className="screen active">
-      <div className="page-head">
-        <div>
-          <h1>Administration</h1>
-          <p className="lede">Créer les tournois, piloter les inscriptions et saisir les résultats.</p>
+      <section className="screen active">
+        <div className="page-head">
+          <div>
+            <h1>Administration</h1>
+            <p className="lede">Créer les tournois, piloter les inscriptions et saisir les résultats.</p>
+          </div>
         </div>
-      </div>
 
-      <div className="admin-grid">
-        <CreateTournoiPanel />
-        <div>
-          <TournoisPilotPanel />
+        <div className="admin-grid">
+          <CreateTournoiPanel />
+          <div>
+            <TournoisPilotPanel />
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
   );
 }
 
@@ -71,6 +72,7 @@ function CreateTournoiPanel() {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [jeuId, setJeuId] = useState(1);
+  const [petiteFinale, setPetiteFinale] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -84,9 +86,15 @@ function CreateTournoiPanel() {
     }
     setCreating(true);
     try {
-      await tournoisApi.creer({ nom: nom.trim(), description: description.trim() || null, jeu_id: jeuId });
+      await tournoisApi.creer({
+        nom: nom.trim(),
+        description: description.trim() || null,
+        jeu_id: jeuId,
+        petite_finale: petiteFinale,
+      });
       setNom("");
       setDescription("");
+      setPetiteFinale(false);
       setSuccess(true);
     } catch (e: any) {
       setError(e.message ?? "Impossible de créer le tournoi.");
@@ -96,34 +104,38 @@ function CreateTournoiPanel() {
   }
 
   return (
-    <div className="panel">
-      <h3>Créer un tournoi</h3>
-      <div className="form-row">
-        <label>Nom du tournoi</label>
-        <input type="text" placeholder="ex. Coupe d'Automne" value={nom} onChange={(e) => setNom(e.target.value)} />
+      <div className="panel">
+        <h3>Créer un tournoi</h3>
+        <div className="form-row">
+          <label>Nom du tournoi</label>
+          <input type="text" placeholder="ex. Coupe d'Automne" value={nom} onChange={(e) => setNom(e.target.value)} />
+        </div>
+        <div className="form-row">
+          <label>Description</label>
+          <input type="text" placeholder="ex. Valorant · 5v5" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <div className="form-row">
+          <label>Identifiant du jeu (jeu_id)</label>
+          <input type="number" min={1} value={jeuId} onChange={(e) => setJeuId(Number(e.target.value))} />
+        </div>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginTop: 8 }}>
+          <input type="checkbox" checked={petiteFinale} onChange={(e) => setPetiteFinale(e.target.checked)} />
+          Petite finale (match pour la 3e place, à partir de 4 équipes)
+        </label>
+        {error && (
+            <p className="search-hint" style={{ color: "var(--live)" }}>
+              {error}
+            </p>
+        )}
+        {success && (
+            <p className="search-hint" style={{ color: "var(--done)" }}>
+              Tournoi créé — retrouvez-le dans la liste à droite.
+            </p>
+        )}
+        <button className="btn" style={{ width: "100%", justifyContent: "center", marginTop: 12 }} disabled={creating} onClick={handleSubmit}>
+          {creating ? "Création…" : "Créer le tournoi"}
+        </button>
       </div>
-      <div className="form-row">
-        <label>Description</label>
-        <input type="text" placeholder="ex. Valorant · 5v5" value={description} onChange={(e) => setDescription(e.target.value)} />
-      </div>
-      <div className="form-row">
-        <label>Identifiant du jeu (jeu_id)</label>
-        <input type="number" min={1} value={jeuId} onChange={(e) => setJeuId(Number(e.target.value))} />
-      </div>
-      {error && (
-        <p className="search-hint" style={{ color: "var(--live)" }}>
-          {error}
-        </p>
-      )}
-      {success && (
-        <p className="search-hint" style={{ color: "var(--done)" }}>
-          Tournoi créé — retrouvez-le dans la liste à droite.
-        </p>
-      )}
-      <button className="btn" style={{ width: "100%", justifyContent: "center", marginTop: 12 }} disabled={creating} onClick={handleSubmit}>
-        {creating ? "Création…" : "Créer le tournoi"}
-      </button>
-    </div>
   );
 }
 
@@ -140,15 +152,21 @@ function TournoisPilotPanel() {
     setLoading(true);
     setError(null);
     tournoisApi
-      .lister()
-      .then(setTournois)
-      .catch((e) => setError(e.message ?? "Erreur de chargement des tournois"))
-      .finally(() => setLoading(false));
+        .lister()
+        .then(setTournois)
+        .catch((e) => setError(e.message ?? "Erreur de chargement des tournois"))
+        .finally(() => setLoading(false));
   }
 
   useEffect(load, []);
 
   async function handleTransition(id: number, next: TournoiStatut) {
+    if (
+        next === "EN_COURS" &&
+        !window.confirm("Démarrer le tournoi ? L'arbre sera généré aléatoirement et ne pourra plus être regénéré.")
+    ) {
+      return;
+    }
     setTransitioning(id);
     try {
       await tournoisApi.modifier(id, { statut: next });
@@ -160,61 +178,79 @@ function TournoisPilotPanel() {
     }
   }
 
+  async function handlePetiteFinale(id: number, value: boolean) {
+    try {
+      await tournoisApi.modifier(id, { petite_finale: value });
+      load();
+    } catch (e: any) {
+      alert(e.message ?? "Modification refusée.");
+    }
+  }
+
   return (
-    <>
-      <div className="panel">
-        <h3>Tournois à piloter</h3>
-        <ApiState loading={loading} error={error} onRetry={load} />
-        {!loading &&
-          !error &&
-          tournois.map((t) => (
-            <div className="admin-list-row" key={t.id} style={{ display: "block" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div className="admin-t-name">{t.nom}</div>
-                  <div className="admin-t-meta">
-                    {STATUT_LABEL[t.statut]} · {t.equipes_ids.length} équipe(s)
+      <>
+        <div className="panel">
+          <h3>Tournois à piloter</h3>
+          <ApiState loading={loading} error={error} onRetry={load} />
+          {!loading &&
+              !error &&
+              tournois.map((t) => (
+                  <div className="admin-list-row" key={t.id} style={{ display: "block" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <div className="admin-t-name">{t.nom}</div>
+                        <div className="admin-t-meta">
+                          {STATUT_LABEL[t.statut]} · {t.equipes_ids.length} équipe(s)
+                        </div>
+                        {(t.statut === "OUVERT" || t.statut === "FERME") && (
+                            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginTop: 4 }}>
+                              <input
+                                  type="checkbox"
+                                  checked={t.petite_finale}
+                                  onChange={(e) => handlePetiteFinale(t.id, e.target.checked)}
+                              />
+                              Petite finale
+                            </label>
+                        )}
+                      </div>
+                      <div className="admin-actions">
+                        {TRANSITIONS[t.statut].map((next) => (
+                            <button
+                                key={next}
+                                className="btn ghost small"
+                                disabled={transitioning === t.id}
+                                onClick={() => handleTransition(t.id, next)}
+                            >
+                              {TRANSITION_ACTION_LABEL[next]}
+                            </button>
+                        ))}
+                        <button className="btn ghost small" onClick={() => setExpandedId(expandedId === t.id ? null : t.id)}>
+                          {expandedId === t.id ? "Fermer" : "Arbre"}
+                        </button>
+                      </div>
+                    </div>
+                    {expandedId === t.id && <MatchManager tournoiId={t.id} statut={t.statut} />}
                   </div>
-                </div>
-                <div className="admin-actions">
-                  {TRANSITIONS[t.statut].map((next) => (
-                    <button
-                      key={next}
-                      className="btn ghost small"
-                      disabled={transitioning === t.id}
-                      onClick={() => handleTransition(t.id, next)}
-                    >
-                      {TRANSITION_ACTION_LABEL[next]}
-                    </button>
-                  ))}
-                  <button className="btn ghost small" onClick={() => setExpandedId(expandedId === t.id ? null : t.id)}>
-                    {expandedId === t.id ? "Fermer" : "Matchs"}
-                  </button>
-                </div>
-              </div>
-              {expandedId === t.id && <MatchManager tournoiId={t.id} />}
-            </div>
-          ))}
-        {!loading && !error && tournois.length === 0 && <p className="search-hint">Aucun tournoi pour l'instant.</p>}
-      </div>
-    </>
+              ))}
+          {!loading && !error && tournois.length === 0 && <p className="search-hint">Aucun tournoi pour l'instant.</p>}
+        </div>
+      </>
   );
 }
 
-/* ------------------------------ Gestion des matchs -------------------------- */
+/* ------------------------- Arbre + saisie des scores ----------------------- */
 
-function MatchManager({ tournoiId }: { tournoiId: number }) {
+function MatchManager({ tournoiId, statut }: { tournoiId: number; statut: TournoiStatut }) {
   const [detail, setDetail] = useState<TournoiDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [equipe1Id, setEquipe1Id] = useState<number | "">("");
-  const [equipe2Id, setEquipe2Id] = useState<number | "">("");
-  const [creatingMatch, setCreatingMatch] = useState(false);
-  const [matchError, setMatchError] = useState<string | null>(null);
-
-  const [scores, setScores] = useState<Record<number, { s1: number; s2: number }>>({});
-  const [savingMatchId, setSavingMatchId] = useState<number | null>(null);
+  const [selected, setSelected] = useState<ArbreMatch | null>(null);
+  const [s1, setS1] = useState(0);
+  const [s2, setS2] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const [viewingSpaceId, setViewingSpaceId] = useState<number | null>(null);
 
@@ -222,145 +258,115 @@ function MatchManager({ tournoiId }: { tournoiId: number }) {
     setLoading(true);
     setError(null);
     tournoisApi
-      .detail(tournoiId)
-      .then((d) => {
-        setDetail(d);
-        const initial: Record<number, { s1: number; s2: number }> = {};
-        for (const m of d.matchs) initial[m.id] = { s1: m.score_equipe1 ?? 0, s2: m.score_equipe2 ?? 0 };
-        setScores(initial);
-      })
-      .catch((e) => setError(e.message ?? "Erreur de chargement du tournoi"))
-      .finally(() => setLoading(false));
+        .detail(tournoiId)
+        .then(setDetail)
+        .catch((e) => setError(e.message ?? "Erreur de chargement du tournoi"))
+        .finally(() => setLoading(false));
   }
 
   useEffect(load, [tournoiId]);
 
-  async function handleCreateMatch() {
-    setMatchError(null);
-    if (equipe1Id === "" || equipe2Id === "") {
-      setMatchError("Sélectionnez les deux équipes.");
-      return;
-    }
-    setCreatingMatch(true);
-    try {
-      await matchsApi.creer({
-        equipe1_id: Number(equipe1Id),
-        equipe2_id: Number(equipe2Id),
-        score_equipe1: 0,
-        score_equipe2: 0,
-      });
-      setEquipe1Id("");
-      setEquipe2Id("");
-      load();
-    } catch (e: any) {
-      setMatchError(e.message ?? "Impossible de créer le match.");
-    } finally {
-      setCreatingMatch(false);
-    }
+  function handleSelect(m: ArbreMatch) {
+    setSelected(m);
+    setS1(m.score_equipe1 ?? 0);
+    setS2(m.score_equipe2 ?? 0);
+    setSaveError(null);
   }
 
-  async function handleSaveScore(matchId: number) {
-    const s = scores[matchId];
-    if (!s) return;
-    setSavingMatchId(matchId);
+  const editable =
+      !!selected && statut === "EN_COURS" && !selected.bye && selected.equipe1_id !== null && selected.equipe2_id !== null;
+
+  async function handleSave() {
+    if (!selected) return;
+    setSaving(true);
+    setSaveError(null);
     try {
-      await matchsApi.modifier(matchId, { score_equipe1: s.s1, score_equipe2: s.s2 });
-      load();
+      await matchsApi.modifier(selected.id, { score_equipe1: s1, score_equipe2: s2 });
+      setSelected(null);
+      setReloadKey((k) => k + 1);
     } catch (e: any) {
-      alert(e.message ?? "Impossible d'enregistrer le résultat.");
+      setSaveError(e.message ?? "Impossible d'enregistrer le résultat.");
     } finally {
-      setSavingMatchId(null);
+      setSaving(false);
     }
   }
 
   return (
-    <div className="match-manage open">
-      <ApiState loading={loading} error={error} onRetry={load} />
-      {!loading && !error && detail && (
-        <>
-          <p className="search-hint" style={{ marginBottom: 8 }}>
-            Créer un match entre deux équipes engagées :
-          </p>
-          <div className="match-manage-row">
-            <select value={equipe1Id} onChange={(e) => setEquipe1Id(e.target.value ? Number(e.target.value) : "")}>
-              <option value="">Équipe 1…</option>
-              {detail.equipes.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.nom}
-                </option>
-              ))}
-            </select>
-            <select value={equipe2Id} onChange={(e) => setEquipe2Id(e.target.value ? Number(e.target.value) : "")}>
-              <option value="">Équipe 2…</option>
-              {detail.equipes.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.nom}
-                </option>
-              ))}
-            </select>
-            <button className="btn ghost small" disabled={creatingMatch} onClick={handleCreateMatch}>
-              Créer le match
-            </button>
-          </div>
-          {matchError && (
-            <p className="search-hint" style={{ color: "var(--live)" }}>
-              {matchError}
-            </p>
-          )}
+      <div className="match-manage open">
+        <ApiState loading={loading} error={error} onRetry={load} />
+        {!loading && !error && detail && (
+            <>
+              <p className="search-hint" style={{ marginBottom: 8 }}>
+                {statut === "EN_COURS"
+                    ? "Cliquez sur un match pour saisir ou corriger son score (nombre de manches gagnées, pas de nul). Pour un forfait, entrez simplement 1 – 0."
+                    : "L'arbre est généré au démarrage du tournoi ; les scores se saisissent lorsqu'il est En cours."}
+              </p>
 
-          <p className="search-hint" style={{ margin: "14px 0 8px" }}>
-            Saisir / corriger un résultat (pas d'état « forfait » dédié dans l'API : entrez simplement le score du
-            walkover, ex. 1 – 0) :
-          </p>
-          {detail.matchs.map((m) => {
-            const e1 = detail.equipes.find((e) => e.id === m.equipe1_id);
-            const e2 = detail.equipes.find((e) => e.id === m.equipe2_id);
-            const s = scores[m.id] ?? { s1: 0, s2: 0 };
-            return (
-              <div className="match-manage-row" key={m.id}>
-                <span className="m-team">
-                  {e1?.nom ?? `#${m.equipe1_id}`} vs {e2?.nom ?? `#${m.equipe2_id}`}
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={s.s1}
-                  onChange={(e) => setScores((prev) => ({ ...prev, [m.id]: { ...s, s1: Number(e.target.value) } }))}
-                />
-                <input
-                  type="number"
-                  min={0}
-                  value={s.s2}
-                  onChange={(e) => setScores((prev) => ({ ...prev, [m.id]: { ...s, s2: Number(e.target.value) } }))}
-                />
-                <button className="btn small" disabled={savingMatchId === m.id} onClick={() => handleSaveScore(m.id)}>
-                  {savingMatchId === m.id ? "…" : "Enregistrer"}
-                </button>
+              <BracketSection
+                  tournoiId={tournoiId}
+                  statut={statut}
+                  reloadKey={reloadKey}
+                  onMatchClick={handleSelect}
+                  selectedMatchId={selected?.id ?? null}
+              />
+
+              {selected && (
+                  <div className="panel" style={{ marginTop: 10 }}>
+                    <h3>
+                      {selected.equipe1_nom ?? "À déterminer"} vs {selected.equipe2_nom ?? "À déterminer"}
+                    </h3>
+                    {editable ? (
+                        <>
+                          <div className="match-manage-row">
+                            <span className="m-team">{selected.equipe1_nom}</span>
+                            <input type="number" min={0} value={s1} onChange={(e) => setS1(Number(e.target.value))} />
+                            <input type="number" min={0} value={s2} onChange={(e) => setS2(Number(e.target.value))} />
+                            <span className="m-team">{selected.equipe2_nom}</span>
+                          </div>
+                          <div className="match-manage-actions" style={{ marginTop: 10 }}>
+                            <button className="btn small" disabled={saving} onClick={handleSave}>
+                              {saving ? "…" : "Enregistrer"}
+                            </button>
+                            <button className="btn ghost small" onClick={() => setSelected(null)}>
+                              Annuler
+                            </button>
+                          </div>
+                        </>
+                    ) : (
+                        <p className="search-hint">
+                          {statut !== "EN_COURS"
+                              ? "Le tournoi doit être En cours pour saisir un score."
+                              : "Ce match n'a pas encore ses deux équipes."}
+                        </p>
+                    )}
+                    {saveError && (
+                        <p className="search-hint" style={{ color: "var(--live)" }}>
+                          {saveError}
+                        </p>
+                    )}
+                  </div>
+              )}
+
+              <p className="search-hint" style={{ margin: "14px 0 8px" }}>
+                Espaces d'équipes — consultation seule :
+              </p>
+              <div className="match-manage-row" style={{ flexWrap: "wrap" }}>
+                <select
+                    value={viewingSpaceId ?? ""}
+                    onChange={(e) => setViewingSpaceId(e.target.value ? Number(e.target.value) : null)}
+                >
+                  <option value="">Choisir une équipe…</option>
+                  {detail.equipes.map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.nom}
+                      </option>
+                  ))}
+                </select>
               </div>
-            );
-          })}
-          {detail.matchs.length === 0 && <p className="search-hint">Aucun match pour l'instant.</p>}
-
-          <p className="search-hint" style={{ margin: "14px 0 8px" }}>
-            Espaces d'équipes — consultation seule :
-          </p>
-          <div className="match-manage-row" style={{ flexWrap: "wrap" }}>
-            <select
-              value={viewingSpaceId ?? ""}
-              onChange={(e) => setViewingSpaceId(e.target.value ? Number(e.target.value) : null)}
-            >
-              <option value="">Choisir une équipe…</option>
-              {detail.equipes.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.nom}
-                </option>
-              ))}
-            </select>
-          </div>
-          {viewingSpaceId !== null && <TeamSpaceViewer equipeId={viewingSpaceId} />}
-        </>
-      )}
-    </div>
+              {viewingSpaceId !== null && <TeamSpaceViewer equipeId={viewingSpaceId} />}
+            </>
+        )}
+      </div>
   );
 }
 
@@ -373,26 +379,26 @@ function TeamSpaceViewer({ equipeId }: { equipeId: number }) {
     setLoading(true);
     setError(null);
     messagesApi
-      .lister(equipeId)
-      .then(setMessages)
-      .catch((e) => setError(e.message ?? "Erreur de chargement des messages"))
-      .finally(() => setLoading(false));
+        .lister(equipeId)
+        .then(setMessages)
+        .catch((e) => setError(e.message ?? "Erreur de chargement des messages"))
+        .finally(() => setLoading(false));
   }, [equipeId]);
 
   return (
-    <div className="panel" style={{ marginTop: 10 }}>
-      <ApiState loading={loading} error={error} />
-      {!loading && !error && (
-        <>
-          {messages.length === 0 && <p className="search-hint">Aucun message dans cet espace.</p>}
-          {messages.map((m) => (
-            <div className="space-row" key={m.id}>
-              <span>Utilisateur #{m.utilisateur_id}</span>
-              <span className="st">{m.message}</span>
-            </div>
-          ))}
-        </>
-      )}
-    </div>
+      <div className="panel" style={{ marginTop: 10 }}>
+        <ApiState loading={loading} error={error} />
+        {!loading && !error && (
+            <>
+              {messages.length === 0 && <p className="search-hint">Aucun message dans cet espace.</p>}
+              {messages.map((m) => (
+                  <div className="space-row" key={m.id}>
+                    <span>Utilisateur #{m.utilisateur_id}</span>
+                    <span className="st">{m.message}</span>
+                  </div>
+              ))}
+            </>
+        )}
+      </div>
   );
 }

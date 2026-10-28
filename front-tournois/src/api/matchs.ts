@@ -1,9 +1,9 @@
 import { api } from "./client.ts";
-import type { Match, MatchCreatePayload, MatchUpdatePayload } from "./types.ts";
+import type { Match, MatchUpdatePayload } from "./types.ts";
 
 export const matchsApi = {
-  // Note : le contrôleur utilise le préfixe "/match" (singulier, sans slash final).
-  lister: () => api.get<Match[]>("/match"),
-  creer: (payload: MatchCreatePayload) => api.post<Match>("/match", payload),
-  modifier: (id: number, payload: MatchUpdatePayload) => api.put<Match>(`/match/${id}`, payload),
+  // Le contrôleur utilise le préfixe "/matchs" (avec un s).
+  lister: () => api.get<Match[]>("/matchs/"),
+  modifier: (id: number, payload: MatchUpdatePayload) =>
+      api.patch<Match>(`/matchs/${id}`, payload),
 };

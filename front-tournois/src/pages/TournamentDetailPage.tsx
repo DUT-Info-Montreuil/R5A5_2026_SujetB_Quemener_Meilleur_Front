@@ -5,6 +5,7 @@ import { tournoisApi } from "../api/tournois.ts";
 import { equipesApi } from "../api/equipes.ts";
 import { utilisateursApi } from "../api/utilisateurs.ts";
 import ApiState from "../components/ApiState.tsx";
+import BracketSection from "../components/BracketSection.tsx";
 import { IconLock } from "../components/Icons.tsx";
 
 interface TournamentDetailPageProps {
@@ -116,9 +117,17 @@ export default function TournamentDetailPage({
               </div>
 
               <div className="tabs">
-                <button className={`tab ${detailTab === "d-teams" ? "active" : ""}`} onClick={() => setDetailTab("d-teams")}>Équipes</button>
-                <button className={`tab ${detailTab === "d-matchs" ? "active" : ""}`} onClick={() => setDetailTab("d-matchs")}>Matchs</button>
-                <button className={`tab ${detailTab === "d-results" ? "active" : ""}`} onClick={() => setDetailTab("d-results")}>Résultats</button>
+                {(
+                    [
+                      ["d-teams", "Équipes"],
+                      ["d-matchs", "Matchs"],
+                      ["d-results", "Résultats"],
+                    ] as [DetailTab, string][]
+                ).map(([id, label]) => (
+                    <button key={id} className={`tab ${detailTab === id ? "active" : ""}`} onClick={() => setDetailTab(id)}>
+                      {label}
+                    </button>
+                ))}
               </div>
 
               {detailTab === "d-teams" && (
@@ -226,30 +235,10 @@ export default function TournamentDetailPage({
                   <span className="live-dot" />
                   Mis à jour par l'administrateur
                 </span>
-                      Les scores sont saisis depuis l'écran Administration.
+                      Arbre d'élimination directe — les scores sont saisis depuis l'écran Administration.
                     </div>
                     <div className="panel">
-                      {detail.matchs.length === 0 && <p className="search-hint">Aucun match programmé pour l'instant.</p>}
-                      {detail.matchs.map((m) => {
-                        const e1 = detail.equipes.find((e) => e.id === m.equipe1_id);
-                        const e2 = detail.equipes.find((e) => e.id === m.equipe2_id);
-                        const played = m.score_equipe1 !== null && m.score_equipe2 !== null;
-                        return (
-                            <div className="team-row" key={m.id}>
-                              <div className="team-id">
-                                <div>
-                                  <div className="team-name">
-                                    {e1?.nom ?? `Équipe #${m.equipe1_id}`} vs {e2?.nom ?? `Équipe #${m.equipe2_id}`}
-                                  </div>
-                                  <div className="team-cap">{played ? "Terminé" : "En attente du résultat"}</div>
-                                </div>
-                              </div>
-                              <div className="team-count score-final">
-                                {played ? `${m.score_equipe1} – ${m.score_equipe2}` : "–"}
-                              </div>
-                            </div>
-                        );
-                      })}
+                      <BracketSection tournoiId={detail.id} statut={detail.statut} />
                     </div>
                   </div>
               )}

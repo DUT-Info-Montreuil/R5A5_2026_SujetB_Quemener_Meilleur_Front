@@ -1,11 +1,3 @@
-/* =============================================================================
-   Types alignés sur ce que vos services renvoient (equipe_service.py,
-   tournoi_service.py, match_service.py, message_service.py,
-   utilisateur_service.py). Les DTO Pydantic eux-mêmes n'étaient pas fournis :
-   si un champ diffère chez vous (ex. mdp exposé, ou des dates sur Tournoi),
-   ajustez simplement les interfaces ci-dessous — tout le reste suit.
-   ============================================================================= */
-
 export type TournoiStatut = "OUVERT" | "FERME" | "EN_COURS" | "TERMINE";
 
 export interface Tournoi {
@@ -15,6 +7,7 @@ export interface Tournoi {
   statut: TournoiStatut;
   jeu_id: number;
   equipes_ids: number[];
+  petite_finale: boolean;
   // Présents dans tournoi_service (modifier_tournoi les lit/écrit) mais jamais
   // initialisés par creer_tournoi aujourd'hui : optionnels côté front.
   date_debut?: string | null;
@@ -30,11 +23,13 @@ export interface TournoiCreatePayload {
   nom: string;
   description?: string | null;
   jeu_id: number;
+  petite_finale?: boolean;
 }
 
 export interface TournoiUpdatePayload {
   nom?: string;
   statut?: TournoiStatut;
+  petite_finale?: boolean;
   date_debut?: string | null;
   date_fin?: string | null;
 }
@@ -61,22 +56,45 @@ export interface EquipeCreatePayload {
 
 export interface Match {
   id: number;
-  equipe1_id: number;
-  equipe2_id: number;
+  tournoi_id: number;
+  round: number;
+  position: number;
+  // null tant que l'équipe n'est pas connue (tours suivants) ou pour un bye
+  equipe1_id: number | null;
+  equipe2_id: number | null;
+  // null tant que le match n'est pas joué (score = manches gagnées)
   score_equipe1: number | null;
   score_equipe2: number | null;
+  vainqueur_id: number | null;
+  next_match_id: number | null;
+  next_slot: number | null;
+  loser_next_match_id: number | null;
+  loser_next_slot: number | null;
+  petite_finale: boolean;
+  bye: boolean;
 }
 
-export interface MatchCreatePayload {
-  equipe1_id: number;
-  equipe2_id: number;
-  score_equipe1: number;
-  score_equipe2: number;
+/* Arbre d'élimination directe (GET /tournois/{id}/arbre) */
+export interface ArbreMatch extends Match {
+  equipe1_nom: string | null;
+  equipe2_nom: string | null;
+}
+
+export interface ArbreRound {
+  round: number;
+  titre: string;
+  matchs: ArbreMatch[];
+}
+
+export interface Arbre {
+  tournoi_id: number;
+  rounds: ArbreRound[];
+  petite_finale: ArbreMatch | null;
 }
 
 export interface MatchUpdatePayload {
-  score_equipe1?: number;
-  score_equipe2?: number;
+  score_equipe1: number;
+  score_equipe2: number;
 }
 
 export interface Message {
