@@ -117,17 +117,9 @@ export default function TournamentDetailPage({
               </div>
 
               <div className="tabs">
-                {(
-                    [
-                      ["d-teams", "Équipes"],
-                      ["d-matchs", "Matchs"],
-                      ["d-results", "Résultats"],
-                    ] as [DetailTab, string][]
-                ).map(([id, label]) => (
-                    <button key={id} className={`tab ${detailTab === id ? "active" : ""}`} onClick={() => setDetailTab(id)}>
-                      {label}
-                    </button>
-                ))}
+                <button className={`tab ${detailTab === "d-teams" ? "active" : ""}`} onClick={() => setDetailTab("d-teams")}>Équipes</button>
+                <button className={`tab ${detailTab === "d-matchs" ? "active" : ""}`} onClick={() => setDetailTab("d-matchs")}>Matchs</button>
+                <button className={`tab ${detailTab === "d-results" ? "active" : ""}`} onClick={() => setDetailTab("d-results")}>Résultats</button>
               </div>
 
               {detailTab === "d-teams" && (
