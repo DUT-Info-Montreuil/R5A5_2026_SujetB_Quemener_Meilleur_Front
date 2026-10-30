@@ -30,6 +30,8 @@ export default function TournamentDetailPage({
                                                openEquipe,
                                                goBack,
                                              }: TournamentDetailPageProps) {
+  const isVisitor = currentUserId === null;
+
   const [detail, setDetail] = useState<TournoiDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,9 +55,14 @@ export default function TournamentDetailPage({
   }
 
   useEffect(load, [tournoiId]);
+  // La liste des utilisateurs est réservée aux personnes connectées.
   useEffect(() => {
+    if (isVisitor) {
+      setUsers([]);
+      return;
+    }
     utilisateursApi.lister().then(setUsers).catch(() => {});
-  }, []);
+  }, [isVisitor]);
 
   const usersById = useMemo(() => new Map(users.map((u) => [u.id, u])), [users]);
 
@@ -64,7 +71,7 @@ export default function TournamentDetailPage({
   }
 
   async function handleCreateTeam() {
-    if (!detail) return;
+    if (!detail || isVisitor) return;
     setCreateError(null);
     if (!newTeamName.trim()) {
       setCreateError("Le nom de l'équipe est obligatoire.");
@@ -127,7 +134,9 @@ export default function TournamentDetailPage({
                     <div className={`engage-bar ${detail.statut !== "OUVERT" ? "locked" : ""}`}>
                       <div className="engage-copy">
                         {detail.statut === "OUVERT" ? (
-                            isAdmin ? (
+                            isVisitor ? (
+                                <>Inscriptions ouvertes — connectez-vous pour créer une équipe.</>
+                            ) : isAdmin ? (
                                 <>Inscriptions ouvertes — les administrateurs ne peuvent pas créer ni rejoindre d'équipe.</>
                             ) : (
                                 <>Inscriptions ouvertes — créez une équipe pour engager vos joueurs.</>
@@ -139,7 +148,7 @@ export default function TournamentDetailPage({
                             </>
                         )}
                       </div>
-                      {detail.statut === "OUVERT" && !isAdmin && (
+                      {detail.statut === "OUVERT" && !isVisitor && !isAdmin && (
                           <div className="engage-actions">
                             <button className="btn small" onClick={() => setShowCreateForm((v) => !v)}>
                               Créer une équipe
@@ -148,7 +157,7 @@ export default function TournamentDetailPage({
                       )}
                     </div>
 
-                    {showCreateForm && !isAdmin && (
+                    {showCreateForm && !isVisitor && !isAdmin && (
                         <div className="join-panel">
                           <h4>Nouvelle équipe</h4>
                           <div className="form-row">
@@ -204,7 +213,11 @@ export default function TournamentDetailPage({
                                 <div className="team-avatar">{e.nom.slice(0, 2).toUpperCase()}</div>
                                 <div>
                                   <div className="team-name">{e.nom}</div>
-                                  <div className="team-cap">Capitaine — {captain ? captain.login : `#${captainId}`}</div>
+                                  <div className="team-cap">
+                                    {isVisitor
+                                        ? "Voir les membres"
+                                        : `Capitaine — ${captain ? captain.login : `#${captainId}`}`}
+                                  </div>
                                 </div>
                               </div>
                               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

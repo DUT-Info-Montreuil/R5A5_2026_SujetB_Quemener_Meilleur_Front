@@ -22,7 +22,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       ...options,
       headers: {
         "Content-Type": "application/json",
-        // Jeton de connexion envoyé à chaque requête
+        // Jeton de connexion envoyé à chaque requête (absent pour un visiteur)
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers ?? {}),
       },
@@ -35,8 +35,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     );
   }
 
-  // Jeton expiré ou invalide : on prévient App.tsx, qui renvoie à la page de connexion.
-  if (res.status === 401) {
+  // Jeton expiré ou invalide : on prévient App.tsx. Uniquement si un jeton
+  // existait : un visiteur sans jeton qui reçoit un 401 n'a pas de session à fermer.
+  if (res.status === 401 && token) {
     tokenStore.clear();
     window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
   }
