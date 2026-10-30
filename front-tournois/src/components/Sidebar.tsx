@@ -1,14 +1,26 @@
-
 import { NavLink } from "react-router-dom";
 import type { AuthUser } from "../api/auth.ts";
 import { IconTrophy, IconTeam, IconShield } from "./Icons.tsx";
 
 interface SidebarProps {
-    currentUser: AuthUser;
+    currentUser: AuthUser | null;
     onLogout: () => void;
+    onLogin: () => void;
 }
 
-export default function Sidebar({ currentUser, onLogout }: SidebarProps) {
+const footButtonStyle = {
+    marginTop: 4,
+    width: "100%",
+    fontSize: 11,
+    cursor: "pointer",
+    background: "#2A2534",
+    color: "#C8C2D6",
+    border: "1px solid #3A3448",
+    borderRadius: 4,
+    padding: "3px 5px",
+} as const;
+
+export default function Sidebar({ currentUser, onLogout, onLogin }: SidebarProps) {
     return (
         <aside className="rail">
             <div className="rail-brand">
@@ -26,7 +38,7 @@ export default function Sidebar({ currentUser, onLogout }: SidebarProps) {
                     <IconTrophy /> Tournois
                 </NavLink>
 
-                {!currentUser.is_admin && (
+                {currentUser && !currentUser.is_admin && (
                     <NavLink
                         to="/equipes"
                         className={({ isActive }) =>
@@ -37,7 +49,7 @@ export default function Sidebar({ currentUser, onLogout }: SidebarProps) {
                     </NavLink>
                 )}
 
-                {currentUser.is_admin && (
+                {currentUser?.is_admin && (
                     <NavLink
                         to="/admin"
                         className={({ isActive }) =>
@@ -51,33 +63,32 @@ export default function Sidebar({ currentUser, onLogout }: SidebarProps) {
 
             <div className="rail-foot">
                 <div className="rail-user">
-                    <div className="rail-avatar">
-                        {currentUser.login.slice(0, 2).toUpperCase()}
-                    </div>
+                    {currentUser ? (
+                        <>
+                            <div className="rail-avatar">
+                                {currentUser.login.slice(0, 2).toUpperCase()}
+                            </div>
 
-                    <div className="rail-user-meta" style={{ width: "100%" }}>
-                        <div className="name">
-                            {currentUser.login}{" "}
-                            {currentUser.is_admin ? "(admin)" : ""}
+                            <div className="rail-user-meta" style={{ width: "100%" }}>
+                                <div className="name">
+                                    {currentUser.login}{" "}
+                                    {currentUser.is_admin ? "(admin)" : ""}
+                                </div>
+
+                                <button onClick={onLogout} style={footButtonStyle}>
+                                    Se déconnecter
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="rail-user-meta" style={{ width: "100%" }}>
+                            <div className="name">Visiteur</div>
+
+                            <button onClick={onLogin} style={footButtonStyle}>
+                                Se connecter
+                            </button>
                         </div>
-
-                        <button
-                            onClick={onLogout}
-                            style={{
-                                marginTop: 4,
-                                width: "100%",
-                                fontSize: 11,
-                                cursor: "pointer",
-                                background: "#2A2534",
-                                color: "#C8C2D6",
-                                border: "1px solid #3A3448",
-                                borderRadius: 4,
-                                padding: "3px 5px",
-                            }}
-                        >
-                            Se déconnecter
-                        </button>
-                    </div>
+                    )}
                 </div>
             </div>
         </aside>

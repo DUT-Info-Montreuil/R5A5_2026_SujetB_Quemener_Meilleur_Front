@@ -98,10 +98,6 @@ export default function AuthPage({ onAuthenticated }: AuthPageProps) {
                                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                             />
                         </div>
-                        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginTop: 8 }}>
-                            <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
-                            Je suis administrateur
-                        </label>
                     </>
                 )}
 
