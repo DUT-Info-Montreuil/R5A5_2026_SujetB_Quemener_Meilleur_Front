@@ -1,122 +1,99 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { useAuth } from "./hooks/useAuth.ts";
+import Sidebar from "./components/Sidebar.tsx";
+import ApiState from "./components/ApiState.tsx";
+import AuthPage from "./pages/AuthPage.tsx";
+import TournamentsPage from "./pages/TournamentsPage.tsx";
+import AdminPage from "./pages/AdminPage.tsx";
+import TournoiDetailRoute from "./routes/TournoiDetailRoute.tsx";
+import TeamRoute from "./routes/TeamRoute.tsx";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+    const navigate = useNavigate();
+    const { currentUser, checkingSession, handleAuthenticated, logout } = useAuth();
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    if (checkingSession) {
+        return (
+            <div className="liut-app">
+                <ApiState loading={true} error={null} />
+            </div>
+        );
+    }
+
+    // Visiteur : currentUserId = null, isAdmin = false (consultation seule)
+    const currentUserId = currentUser?.id ?? null;
+    const isAdmin = currentUser?.is_admin ?? false;
+    const openTournoi = (id: number) => navigate(`/tournois/${id}`);
+
+    const handleLogout = () => {
+        logout();
+        navigate("/tournois");
+    };
+
+    return (
+        <div className="liut-app">
+            <div className="app">
+                <Sidebar
+                    currentUser={currentUser}
+                    onLogout={handleLogout}
+                    onLogin={() => navigate("/connexion")}
+                />
+                <main className="main">
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/tournois" replace />} />
+
+                        {/* --- Pages publiques (consultation) --- */}
+                        <Route path="/tournois" element={<TournamentsPage openTournoi={openTournoi} />} />
+                        <Route
+                            path="/tournois/:tournoiId"
+                            element={<TournoiDetailRoute currentUserId={currentUserId} isAdmin={isAdmin} />}
+                        />
+                        <Route
+                            path="/equipes/:equipeId"
+                            element={<TeamRoute currentUserId={currentUserId} isAdmin={isAdmin} />}
+                        />
+
+                        {/* --- Connexion --- */}
+                        <Route
+                            path="/connexion"
+                            element={
+                                currentUser ? (
+                                    <Navigate to="/tournois" replace />
+                                ) : (
+                                    <AuthPage onAuthenticated={handleAuthenticated} />
+                                )
+                            }
+                        />
+
+                        {/* --- Pages privées --- */}
+                        <Route
+                            path="/equipes"
+                            element={
+                                currentUser ? (
+                                    <TeamRoute currentUserId={currentUserId} isAdmin={isAdmin} />
+                                ) : (
+                                    <Navigate to="/connexion" replace />
+                                )
+                            }
+                        />
+                        <Route
+                            path="/admin"
+                            element={
+                                !currentUser ? (
+                                    <Navigate to="/connexion" replace />
+                                ) : isAdmin ? (
+                                    <AdminPage currentUserId={currentUserId} openTournoi={openTournoi} />
+                                ) : (
+                                    <Navigate to="/tournois" replace />
+                                )
+                            }
+                        />
+
+                        <Route path="*" element={<Navigate to="/tournois" replace />} />
+                    </Routes>
+                </main>
+            </div>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    );
 }
-
-export default App
