@@ -47,7 +47,7 @@ export default function TeamDetail({ equipeId, currentUserId, onClearEquipe }: T
   );
 
   const isMember = currentUserId !== null && Boolean(detail?.joueurs_ids.includes(currentUserId));
-  const captainId = detail?.joueurs_ids[0];
+  const captainId = detail?.capitaine_id;
   const isCaptain = currentUserId !== null && currentUserId === captainId;
 
   async function sendMessage() {
@@ -90,8 +90,7 @@ export default function TeamDetail({ equipeId, currentUserId, onClearEquipe }: T
                 <div>
                   <h1>{detail.nom}</h1>
                   <p className="lede">
-                    Engagée sur {detail.tournoi ? detail.tournoi.nom : `le tournoi #${detail.tournoi_id}`} — le
-                    renommage, les rôles et l'exclusion ne sont pas encore pris en charge par l'API.
+                    Engagée sur {detail.tournoi ? detail.tournoi.nom : `le tournoi #${detail.tournoi_id}`}
                   </p>
                 </div>
                 {isMember && <span className="pill-status">Vous êtes membre</span>}

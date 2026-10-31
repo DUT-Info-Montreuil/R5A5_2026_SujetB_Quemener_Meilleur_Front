@@ -46,6 +46,7 @@ export interface EquipeDetail extends Equipe {
   joueurs: Utilisateur[];
   matchs: Match[];
   messages: Message[];
+  capitaine_id: number;
 }
 
 export interface EquipeCreatePayload {
