@@ -4,6 +4,21 @@ import { tokenStore, UNAUTHORIZED_EVENT } from "./token.ts";
 //   VITE_API_BASE_URL=http://localhost:8000
 export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
+// Logs actifs en dev, ou en prod si VITE_API_LOGS=true
+const LOGS_ENABLED = import.meta.env.DEV || import.meta.env.VITE_API_LOGS === "true";
+
+type Level = "INFO" | "WARN" | "ERROR";
+
+// Écrit une ligne JSON dans la console du navigateur.
+// On utilise console.info/warn/error pour que le filtre par niveau des DevTools fonctionne.
+function log(level: Level, fields: Record<string, unknown>) {
+  if (!LOGS_ENABLED) return;
+  const line = JSON.stringify({ timestamp: new Date().toISOString(), level, ...fields });
+  if (level === "ERROR") console.error(line);
+  else if (level === "WARN") console.warn(line);
+  else console.info(line);
+}
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -15,6 +30,10 @@ export class ApiError extends Error {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = tokenStore.get();
+  const method = options.method ?? "GET";
+  const requestId = crypto.randomUUID().slice(0, 8);
+  const startedAt = performance.now();
+  const duration = () => Math.round(performance.now() - startedAt);
 
   let res: Response;
   try {
@@ -27,8 +46,18 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         ...(options.headers ?? {}),
       },
     });
-  } catch {
+  } catch (err) {
     // Erreur réseau : backend injoignable ou CORS bloqué.
+    log("ERROR", {
+      message: "request_failed",
+      method,
+      path,
+      status: 0,
+      duration_ms: duration(),
+      exception: err instanceof Error ? err.name : "UnknownError",
+      error: err instanceof Error ? err.message : String(err),
+      request_id: requestId,
+    });
     throw new ApiError(
         0,
         `Impossible de joindre l'API (${BASE_URL}${path}). Le backend est-il démarré et le CORS configuré ?`
@@ -38,6 +67,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   // Jeton expiré ou invalide : on prévient App.tsx. Uniquement si un jeton
   // existait : un visiteur sans jeton qui reçoit un 401 n'a pas de session à fermer.
   if (res.status === 401 && token) {
+    log("WARN", {
+      message: "session_closed",
+      method,
+      path,
+      status: 401,
+      request_id: requestId,
+    });
     tokenStore.clear();
     window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
   }
@@ -51,8 +87,26 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     } catch {
       /* corps non-JSON, on garde res.statusText */
     }
+    log("ERROR", {
+      message: "request_failed",
+      method,
+      path,
+      status: res.status,
+      duration_ms: duration(),
+      exception: "ApiError",
+      error: detail,
+      request_id: requestId,
+    });
     throw new ApiError(res.status, detail);
   }
+
+  log("INFO", {
+    method,
+    path,
+    status: res.status,
+    duration_ms: duration(),
+    request_id: requestId,
+  });
 
   if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
