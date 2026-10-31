@@ -22,7 +22,6 @@ export interface TournoiDetail extends Tournoi {
 export interface TournoiCreatePayload {
   nom: string;
   description?: string | null;
-  jeu_id: number;
   petite_finale?: boolean;
 }
 

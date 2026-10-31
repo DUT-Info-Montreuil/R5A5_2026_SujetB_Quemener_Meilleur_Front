@@ -71,7 +71,6 @@ export default function AdminPage({ currentUserId }: AdminPageProps) {
 function CreateTournoiPanel() {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
-  const [jeuId, setJeuId] = useState(1);
   const [petiteFinale, setPetiteFinale] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +88,6 @@ function CreateTournoiPanel() {
       await tournoisApi.creer({
         nom: nom.trim(),
         description: description.trim() || null,
-        jeu_id: jeuId,
         petite_finale: petiteFinale,
       });
       setNom("");
@@ -113,10 +111,6 @@ function CreateTournoiPanel() {
         <div className="form-row">
           <label>Description</label>
           <input type="text" placeholder="ex. Valorant · 5v5" value={description} onChange={(e) => setDescription(e.target.value)} />
-        </div>
-        <div className="form-row">
-          <label>Identifiant du jeu (jeu_id)</label>
-          <input type="number" min={1} value={jeuId} onChange={(e) => setJeuId(Number(e.target.value))} />
         </div>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginTop: 8 }}>
           <input type="checkbox" checked={petiteFinale} onChange={(e) => setPetiteFinale(e.target.checked)} />
