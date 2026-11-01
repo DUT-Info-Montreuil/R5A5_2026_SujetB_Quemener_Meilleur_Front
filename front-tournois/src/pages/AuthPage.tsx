@@ -11,7 +11,6 @@ export default function AuthPage({ onAuthenticated }: AuthPageProps) {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
-    const [isAdmin, setIsAdmin] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
